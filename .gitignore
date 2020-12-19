@@ -1,0 +1,9 @@
+build
+sdk*
+**/*.exe
+**/*.dll
+**/*.so
+**/*.dylib
+**/*.log
+**/*.out
+.DS_STORE
