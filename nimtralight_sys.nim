@@ -2,7 +2,7 @@ import os, sequtils
 import nimterop/[build, cimport]
 
 const
-  baseDir = currentSourcePath.parentDir.parentDir.parentDir()
+  baseDir = currentSourcePath.parentDir()
   includeDir = baseDir / "include"
   libDir = baseDir / "sdk" / "bin"
   flags = "-C:cdecl -E:__,_ -F:__,_ -f:ast2"
