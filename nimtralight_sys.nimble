@@ -12,10 +12,21 @@ skipDirs = @["build"]
 
 requires "nim >= 1.4.2", "nimterop >= 0.6.13"
 
+when defined(windows):
+  const ext = ".exe"
+else:
+  const ext = ""
+
 proc sampleCmd(name: string): string =
-  if not dirExists("build"): mkDir("build")
-  exec "cp -r sdk/bin/* build/"
-  let outFile = "-o:build" / name
+  if dirExists("build"):
+    rmDir("build")
+  mkDir("build")
+  for kind, file in os.walkDir("sdk/bin"):
+    case kind
+    of pcDir: cpDir(file, "build" / file.extractFilename)
+    of pcFile: cpFile(file, "build" / file.extractFilename)
+    else: discard
+  let outFile = "-o:build" / name & ext
   let src = "samples" / name / "main"
   join(["nim c", outFile, src], " ")
 
