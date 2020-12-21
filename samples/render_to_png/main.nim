@@ -47,7 +47,7 @@ const htmlString = """
 
 proc destroyStrs(strs: varargs[ULString]) =
   for str in strs:
-    str.ulDestroyString
+    str.destroyString
 
 proc onFinish(userData: pointer, called: ULView, frameId: culonglong,
     isMainFrame: bool, url: ULString) {.cdecl.} =
@@ -56,42 +56,42 @@ proc onFinish(userData: pointer, called: ULView, frameId: culonglong,
     done = true
 
 var
-  config = ulCreateConfig()
-  fontName = "Arial".ulCreateString
-  resourcePath = "./resources/".ulCreateString
-  baseDir = "./assets/".ulCreateString
-  logPath = "ultralight.log".ulCreateString
-  html = htmlString.ulCreateString
+  config = newULConfig()
+  fontName = "Arial".newULString
+  resourcePath = "./resources/".newULString
+  baseDir = "./assets/".newULString
+  logPath = "ultralight.log".newULString
+  html = htmlString.newULString
 
-config.ulConfigSetDeviceScale(2.0)
-config.ulConfigSetFontFamilyStandard(fontName)
-config.ulConfigSetResourcePath(resourcePath)
-config.ulConfigSetUseGPURenderer(false)
+config.setDeviceScale(2.0)
+config.setFontFamilyStandard(fontName)
+config.setResourcePath(resourcePath)
+config.setUseGPURenderer(false)
 destroyStrs(fontName, resourcePath)
 
-ulEnablePlatformFontLoader()
-baseDir.ulEnablePlatformFileSystem()
-logPath.ulEnableDefaultLogger()
+enablePlatformFontLoader()
+baseDir.enablePlatformFileSystem()
+logPath.enableDefaultLogger()
 destroyStrs(baseDir, logPath)
 
 var
-  renderer = config.ulCreateRenderer()
-  view = renderer.ulCreateView(1600, 1600, false, nil, false)
+  renderer = config.newULRenderer()
+  view = renderer.newULView(1600, 1600, false, nil, false)
 
-view.ulViewSetFinishLoadingCallback(onFinish, nil)
-view.ulViewLoadHTML(html)
+view.setFinishLoadingCallback(onFinish, nil)
+view.loadHTML(html)
 destroyStrs(html)
 
 echo "Starting Run(), waiting for page to load..."
 
 while not done:
-  renderer.ulUpdate
-  renderer.ulRender
+  renderer.update
+  renderer.render
 
 var
-  surface = view.ulViewGetSurface
-  bitmap = surface.ulBitmapSurfaceGetBitmap
-bitmap.ulBitmapSwapRedBlueChannels()
-discard bitmap.ulBitmapWritePNG("result.png")
+  surface = view.getSurface
+  bitmap = surface.getBitmap
+bitmap.swapRedBlueChannels()
+discard bitmap.writePNG("result.png")
 echo "Saved a render of our page to result.png."
 echo "Finished."

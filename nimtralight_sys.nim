@@ -5,8 +5,7 @@ const
   baseDir = currentSourcePath.parentDir()
   includeDir = baseDir / "include"
   libDir = baseDir / "sdk" / "bin"
-  flags = "-C:cdecl -E:__,_ -F:__,_ -f:ast2"
-  # flags = "-E:__,_ -F:__,_ -f:ast2"
+  flags = "-f:ast2"
   headers = @["UltralightCAPI", "AppCoreCAPI", "JavaScriptCore/JSBase",
       "JavaScriptCore/JSContextRef", "JavaScriptCore/JSStringRef",
       "JavaScriptCore/JSObjectRef", "JavaScriptCore/JSTypedArray", "JavaScriptCore/JSValueRef"]
@@ -72,6 +71,66 @@ cOverride:
     OpaqueJSPropertyNameArray* = pointer
     OpaqueJSPropertyNameAccumulator* = pointer
 
+cPlugin:
+  import strutils, sugar
+
+  proc stripIt(input: var string, chars: set[char]) =
+    input = input.strip(chars = chars)
+
+  proc stripIt(input: var string, sub: string) =
+    if input.startsWith(sub):
+      input = input[sub.len..^1]
+
+  proc replaceIt(input: var string, sub, by: string) =
+    input = input.replace(sub, by)
+
+  proc camelCaseIt(input: var string) =
+    input[0] = input[0].toLowerAscii
+
+  proc nepIt(input: var string) =
+    if '_' in input:
+      var result = ""
+      var upperNext = false
+      for ch in input:
+        if ch == '_':
+          upperNext = true
+          continue
+        else:
+          if upperNext:
+            result.add ch.toUpperAscii
+            upperNext = false
+          else:
+            result.add ch
+      input = result
+
+  proc onSymbol*(sym: var Symbol) {.exportc, dynlib.} =
+    sym.name.stripIt({'_'})
+    if sym.kind == nskProc and sym.name.startsWith("ul"):
+      sym.name = sym.name.dup:
+        replaceIt("ulCreate", "newUL")
+        stripIt("ulConfig")
+        stripIt("ulRenderer")
+        stripIt("ulSession")
+        stripIt("ulView")
+        stripIt("ulBitmapSurface")
+        stripIt("ulBitmap")
+        stripIt("ulString")
+        stripIt("ulBuffer")
+        stripIt("ulSurface")
+        stripIt("ulRect")
+        stripIt("ulIntRect")
+        stripIt("ulRenderTarget")
+        stripIt("ulSettings")
+        stripIt("ulApp")
+        stripIt("ulWindow")
+        stripIt("ulMonitor")
+        stripIt("ulOverlay")
+        stripIt("ul")
+        nepIt()
+        camelCaseIt()
+    if sym.kind == nskParam:
+      sym.name.nepIt()
+
 static:
   cAddStdDir()
   cAddSearchDir(includeDir)
@@ -79,9 +138,12 @@ static:
 cIncludeDir(includeDir)
 
 when defined(macosx):
-  cPassC("-mmacosx-version-min=10.12")
-  cPassL("-mmacosx-version-min=10.12")
+  cPassC("-mmacosx-version-min=10.11")
+  cPassL("-mmacosx-version-min=10.11")
   cPassL("-rpath @executable_path")
+  # cPassL("-std osx-metal1.1")
+  # cPassL("-framework Metal")
+  # cPassL("-lc++")
 elif defined(linux):
   cPassL("-rpath " & libDir)
 

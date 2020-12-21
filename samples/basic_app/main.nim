@@ -18,49 +18,48 @@ proc getMessage(ctx: JSContextRef, function: JSObjectRef;
 proc onUpdate(userData: pointer) {.cdecl.} = discard
 
 proc onResize(userData: pointer, width: cuint, height: cuint) {.cdecl.} =
-  ulOverlayResize(overlay, width, height)
+  overlay.resize(width, height)
 
 proc onDOMReady(userData: pointer, caller: ULView, frameId: culonglong,
     isMainFrame: bool, url: ULString) {.cdecl.} =
   var
-    ctx = view.ulViewLockJSContext
+    ctx = view.lockJSContext
     name = "GetMessage".JSStringCreateWithUTF8CString
     fun = JSObjectMakeFunctionWithCallback(ctx, name, getMessage)
   JSObjectSetProperty(ctx, JSContextGetGlobalObject(ctx), name, fun, 0, nil)
   name.JSStringRelease
-  view.ulViewUnlockJSContext
+  view.unlockJSContext
 
 proc init() =
   var
-    settings = ulCreateSettings()
-  ulSettingsSetForceCPURenderer(settings, true)
+    settings = newULSettings()
+  settings.setForceCPURenderer(true)
 
   var
-    config = ulCreateConfig()
-  app = ulCreateApp(settings, config)
-  ulAppSetUpdateCallback(app, onUpdate, nil)
-  settings.ulDestroySettings
-  config.ulDestroyConfig
-  window = ulCreateWindow(ulAppGetMainMonitor(app), 500, 500, false,
+    config = newULConfig()
+  app = newULApp(settings, config)
+  app.setUpdateCallback(onUpdate, nil)
+  settings.destroySettings
+  config.destroyConfig
+  window = newULWindow(app.getMainMonitor, 500, 500, false,
       kWindowFlags_Titled.cuint) #| kWindowFlags_Resizable)
 
-  ulWindowSetTitle(window, "Ultralight Sample 6 - Intro to C API")
-  ulWindowSetResizeCallback(window, onResize, nil)
-  ulAppSetWindow(app, window)
-  overlay = ulCreateOverlay(window, ulWindowGetWidth(window), ulWindowGetHeight(
-      window), 0, 0)
-  view = overlay.ulOverlayGetView
-  ulViewSetDOMReadyCallback(view, onDOMReady, nil)
+  window.setTitle("Ultralight Sample 6 - Intro to C API")
+  window.setResizeCallback(onResize, nil)
+  app.setWindow(window)
+  overlay = window.newULOverlay(window.getWidth, window.getHeight, 0, 0)
+  view = overlay.getView
+  view.setDOMReadyCallback(onDOMReady, nil)
   var
-    url = "file:///app.html".ulCreateString
-  ulViewLoadURL(view, url)
-  url.ulDestroyString
+    url = "file:///app.html".newULString
+  view.loadURL(url)
+  url.destroyString
 
 proc shutdown() =
-  overlay.ulDestroyOverlay
-  window.ulDestroyWindow
-  app.ulDestroyApp
+  overlay.destroyOverlay
+  window.destroyWindow
+  app.destroyApp
 
 init()
-ulAppRun(app)
+app.run
 shutdown()

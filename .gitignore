@@ -4,6 +4,7 @@ sdk*
 **/*.dll
 **/*.so
 **/*.dylib
+**/*.png
 **/*.log
 **/*.out
 .DS_STORE
