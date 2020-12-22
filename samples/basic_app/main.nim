@@ -1,8 +1,6 @@
 import nimtralight_sys
 
 var
-  app {.global.}: ULApp
-  window {.global.}: ULWindow
   overlay {.global.}: ULOverlay
   view {.global.}: ULView
 
@@ -10,7 +8,7 @@ proc getMessage(ctx: JSContextRef, function: JSObjectRef;
     thisObject: JSObjectRef, argumentCount: uint, arguments: UncheckedArray[
     JSValueRef], exception: ptr JSValueRef): JSValueRef {.cdecl.} =
   var
-    str = "Hello from nim!".JSStringCreateWithUTF8CString
+    str = "Hello from nim!".jsStringCreateWithUTF8CString
     value = JSValueMakeString(ctx, str)
   str.JSStringRelease
   return value
@@ -28,38 +26,35 @@ proc onDOMReady(userData: pointer, caller: ULView, frameId: culonglong,
     fun = JSObjectMakeFunctionWithCallback(ctx, name, getMessage)
   JSObjectSetProperty(ctx, JSContextGetGlobalObject(ctx), name, fun, 0, nil)
   name.JSStringRelease
-  view.unlockJSContext
+  view.unlockjsContext
 
-proc init() =
-  var
-    settings = newULSettings()
-  settings.setForceCPURenderer(true)
+var settings = createSettings()
+settings.setForceCPURenderer(true)
 
-  var
-    config = newULConfig()
-  app = newULApp(settings, config)
-  app.setUpdateCallback(onUpdate, nil)
-  settings.destroySettings
-  config.destroyConfig
-  window = newULWindow(app.getMainMonitor, 500, 500, false,
-      kWindowFlags_Titled.cuint) #| kWindowFlags_Resizable)
+var
+  config = createConfig()
+  app = settings.createApp(config)
 
-  window.setTitle("Ultralight Sample 6 - Intro to C API")
-  window.setResizeCallback(onResize, nil)
-  app.setWindow(window)
-  overlay = window.newULOverlay(window.getWidth, window.getHeight, 0, 0)
-  view = overlay.getView
-  view.setDOMReadyCallback(onDOMReady, nil)
-  var
-    url = "file:///app.html".newULString
-  view.loadURL(url)
-  url.destroyString
+app.setUpdateCallback(onUpdate, nil)
+settings.destroySettings
+config.destroyConfig
 
-proc shutdown() =
-  overlay.destroyOverlay
-  window.destroyWindow
-  app.destroyApp
+var
+  monitor = app.getMainMonitor
+  window = monitor.createWindow(500, 500, false,
+    kWindowFlags_Titled.cuint) #| kWindowFlags_Resizable)
+window.setTitle("Ultralight Sample 6 - Intro to C API")
+window.setResizeCallback(onResize, nil)
+app.setWindow(window)
+overlay = window.createOverlay(window.getWidth, window.getHeight, 0, 0)
+view = overlay.getView
+view.setDOMReadyCallback(onDOMReady, nil)
+var url = "file:///app.html".createString
+view.loadURL(url)
+url.destroyString
 
-init()
 app.run
-shutdown()
+
+overlay.destroyOverlay
+window.destroyWindow
+app.destroyApp

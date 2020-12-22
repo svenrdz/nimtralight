@@ -56,12 +56,12 @@ proc onFinish(userData: pointer, called: ULView, frameId: culonglong,
     done = true
 
 var
-  config = newULConfig()
-  fontName = "Arial".newULString
-  resourcePath = "./resources/".newULString
-  baseDir = "./assets/".newULString
-  logPath = "ultralight.log".newULString
-  html = htmlString.newULString
+  config = createConfig()
+  fontName = "Arial".createString
+  resourcePath = "./resources/".createString
+  baseDir = "./assets/".createString
+  logPath = "ultralight.log".createString
+  html = htmlString.createString
 
 config.setDeviceScale(2.0)
 config.setFontFamilyStandard(fontName)
@@ -75,8 +75,8 @@ logPath.enableDefaultLogger()
 destroyStrs(baseDir, logPath)
 
 var
-  renderer = config.newULRenderer()
-  view = renderer.newULView(1600, 1600, false, nil, false)
+  renderer = config.createRenderer()
+  view = renderer.createView(1600, 1600, false, nil, false)
 
 view.setFinishLoadingCallback(onFinish, nil)
 view.loadHTML(html)

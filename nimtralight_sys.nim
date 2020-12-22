@@ -5,7 +5,6 @@ const
   baseDir = currentSourcePath.parentDir()
   includeDir = baseDir / "include"
   libDir = baseDir / "sdk" / "bin"
-  flags = "-f:ast2"
   headers = @["UltralightCAPI", "AppCoreCAPI", "JavaScriptCore/JSBase",
       "JavaScriptCore/JSContextRef", "JavaScriptCore/JSStringRef",
       "JavaScriptCore/JSObjectRef", "JavaScriptCore/JSTypedArray", "JavaScriptCore/JSValueRef"]
@@ -40,28 +39,28 @@ static:
 
 cOverride:
   type
-    ULConfig* = pointer
-    ULRenderer* = pointer
-    ULSession* = pointer
-    ULView* = pointer
-    ULBitmap* = pointer
-    ULString* = pointer
-    ULBuffer* = pointer
-    ULKeyEvent* = pointer
-    ULMouseEvent* = pointer
-    ULScrollEvent* = pointer
-    ULSurface* = pointer
-    ULBitmapSurface* = pointer
-    JSContextRef* = pointer
+    ULConfig* = distinct pointer
+    ULRenderer* = distinct pointer
+    ULSession* = distinct pointer
+    ULView* = distinct pointer
+    ULBitmap* = distinct pointer
+    ULString* = distinct pointer
+    ULBuffer* = distinct pointer
+    ULKeyEvent* = distinct pointer
+    ULMouseEvent* = distinct pointer
+    ULScrollEvent* = distinct pointer
+    ULSurface* = distinct pointer
+    ULBitmapSurface* = ULSurface
+    JSContextRef* = distinct pointer
 
     ULChar16* = cushort
     JSChar* = cushort
 
-    ULSettings* = pointer
-    ULApp* = pointer
-    ULWindow* = pointer
-    ULMonitor* = pointer
-    ULOverlay* = pointer
+    ULSettings* = distinct pointer
+    ULApp* = distinct pointer
+    ULWindow* = distinct pointer
+    ULMonitor* = distinct pointer
+    ULOverlay* = distinct pointer
 
     OpaqueJSValue* = pointer
     OpaqueJSClass* = pointer
@@ -102,12 +101,12 @@ cPlugin:
           else:
             result.add ch
       input = result
+    input.camelCaseIt
 
   proc onSymbol*(sym: var Symbol) {.exportc, dynlib.} =
     sym.name.stripIt({'_'})
     if sym.kind == nskProc and sym.name.startsWith("ul"):
       sym.name = sym.name.dup:
-        replaceIt("ulCreate", "newUL")
         stripIt("ulConfig")
         stripIt("ulRenderer")
         stripIt("ulSession")
@@ -117,8 +116,8 @@ cPlugin:
         stripIt("ulString")
         stripIt("ulBuffer")
         stripIt("ulSurface")
-        stripIt("ulRect")
-        stripIt("ulIntRect")
+        # stripIt("ulRect")
+        # stripIt("ulIntRect")
         stripIt("ulRenderTarget")
         stripIt("ulSettings")
         stripIt("ulApp")
@@ -126,9 +125,8 @@ cPlugin:
         stripIt("ulMonitor")
         stripIt("ulOverlay")
         stripIt("ul")
-        nepIt()
         camelCaseIt()
-    if sym.kind == nskParam:
+    if sym.kind in {nskParam, nskField}:
       sym.name.nepIt()
 
 static:
@@ -151,4 +149,4 @@ cPassL(fmtLib"Ultralight")
 cPassL(fmtLib"UltralightCore")
 cPassL(fmtLib"AppCore")
 cPassL(fmtLib"WebCore")
-cImport(headers.map(fmtHeader), recurse = true, flags = flags)
+cImport(headers.map(fmtHeader), recurse = true, flags = "-f:ast2")
