@@ -1,8 +1,6 @@
 import nimtralight_sys
 
-var done {.global.} = false
-
-const htmlString = """
+const html = """
   <html>
     <head>
       <style type="text/css">
@@ -45,34 +43,22 @@ const htmlString = """
   </html>
   """
 
-proc destroyStrs(strs: varargs[ULString]) =
-  for str in strs:
-    str.destroyString
+# proc onFinish(userData: pointer, called: ULView, frameId: culonglong,
+#     isMainFrame: bool, url: ULString) {.cdecl.} =
+callback ULFinishLoadingCallback:
+  proc onFinish =
+    if isMainFrame:
+      echo "Our page has loaded!"
 
-proc onFinish(userData: pointer, called: ULView, frameId: culonglong,
-    isMainFrame: bool, url: ULString) {.cdecl.} =
-  if isMainFrame:
-    echo "Our page has loaded!"
-    done = true
-
-var
-  config = createConfig()
-  fontName = "Arial".createString
-  resourcePath = "./resources/".createString
-  baseDir = "./assets/".createString
-  logPath = "ultralight.log".createString
-  html = htmlString.createString
-
-config.setDeviceScale(2.0)
-config.setFontFamilyStandard(fontName)
-config.setResourcePath(resourcePath)
-config.setUseGPURenderer(false)
-destroyStrs(fontName, resourcePath)
+var config = newConfig()
+config.deviceScale = 2.0
+config.fontFamilyStandard = "Arial"
+config.resourcePath = "./resources/"
+config.useGpuRenderer = false
 
 enablePlatformFontLoader()
-baseDir.enablePlatformFileSystem()
-logPath.enableDefaultLogger()
-destroyStrs(baseDir, logPath)
+enablePlatformFileSystem("./assets/")
+enableDefaultLogger("ultralight.log")
 
 var
   renderer = config.createRenderer()
@@ -80,11 +66,10 @@ var
 
 view.setFinishLoadingCallback(onFinish, nil)
 view.loadHTML(html)
-destroyStrs(html)
 
 echo "Starting Run(), waiting for page to load..."
 
-while not done:
+while view.isLoading:
   renderer.update
   renderer.render
 

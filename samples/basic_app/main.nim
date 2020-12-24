@@ -8,50 +8,47 @@ proc getMessage(ctx: JSContextRef, function: JSObjectRef;
     thisObject: JSObjectRef, argumentCount: uint, arguments: UncheckedArray[
     JSValueRef], exception: ptr JSValueRef): JSValueRef {.cdecl.} =
   var
-    str = "Hello from nim!".jsStringCreateWithUTF8CString
+    str = "Hello from nim!".JSStringCreateWithUTF8CString
     value = JSValueMakeString(ctx, str)
   str.JSStringRelease
   return value
 
-proc onUpdate(userData: pointer) {.cdecl.} = discard
+callback ULUpdateCallback:
+  proc onUpdate = discard
 
-proc onResize(userData: pointer, width: cuint, height: cuint) {.cdecl.} =
-  overlay.resize(width, height)
+callback ULResizeCallback:
+  proc onResize =
+    overlay.resize(width, height)
 
-proc onDOMReady(userData: pointer, caller: ULView, frameId: culonglong,
-    isMainFrame: bool, url: ULString) {.cdecl.} =
-  var
-    ctx = view.lockJSContext
-    name = "GetMessage".JSStringCreateWithUTF8CString
-    fun = JSObjectMakeFunctionWithCallback(ctx, name, getMessage)
-  JSObjectSetProperty(ctx, JSContextGetGlobalObject(ctx), name, fun, 0, nil)
-  name.JSStringRelease
-  view.unlockjsContext
+callback ULDOMReadyCallback:
+  proc onDOMReady =
+    var
+      ctx = view.lockJSContext
+      name = "GetMessage".JSStringCreateWithUTF8CString
+      fun = JSObjectMakeFunctionWithCallback(ctx, name, getMessage)
+    JSObjectSetProperty(ctx, JSContextGetGlobalObject(ctx), name, fun, 0, nil)
+    name.JSStringRelease
+    view.unlockjsContext
 
-var settings = createSettings()
-settings.setForceCPURenderer(true)
+var settings = newSettings()
+settings.forceCPURenderer = true
 
 var
-  config = createConfig()
+  config = newConfig()
   app = settings.createApp(config)
 
 app.setUpdateCallback(onUpdate, nil)
-settings.destroySettings
-config.destroyConfig
 
 var
   monitor = app.getMainMonitor
-  window = monitor.createWindow(500, 500, false,
-    kWindowFlags_Titled.cuint) #| kWindowFlags_Resizable)
+  window = monitor.createWindow(500, 500, false, {wfTitled, wfResizable})
 window.setTitle("Ultralight Sample 6 - Intro to C API")
 window.setResizeCallback(onResize, nil)
 app.setWindow(window)
-overlay = window.createOverlay(window.getWidth, window.getHeight, 0, 0)
+overlay = window.createOverlay(window.width, window.height, 0, 0)
 view = overlay.getView
 view.setDOMReadyCallback(onDOMReady, nil)
-var url = "file:///app.html".createString
-view.loadURL(url)
-url.destroyString
+view.loadURL("file:///app.html")
 
 app.run
 

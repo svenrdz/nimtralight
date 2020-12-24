@@ -12,21 +12,15 @@ skipDirs = @["build"]
 
 requires "nim >= 1.4.2", "nimterop >= 0.6.13"
 
-when defined(windows):
-  const ext = ".exe"
-else:
-  const ext = ""
+proc ext(): string =
+  when defined(windows):
+    result = ".exe"
 
 proc sampleCmd(name: string): string =
   if dirExists("build"):
     rmDir("build")
   mkDir("build")
-  for kind, file in os.walkDir("sdk/bin"):
-    case kind
-    of pcDir: cpDir(file, "build" / file.extractFilename)
-    of pcFile: cpFile(file, "build" / file.extractFilename)
-    else: discard
-  let outFile = "-o:build" / name & ext
+  let outFile = "-o:build" / name & ext()
   let src = "samples" / name / "main"
   join(["nim c", outFile, src], " ")
 
@@ -35,3 +29,6 @@ task png, "Build render to png":
 
 task basic, "Build basic app":
   exec sampleCmd("basic_app")
+
+task wrap, "Generate wrap":
+  exec "nim c -rf nimtralight_sys/genwrap"
