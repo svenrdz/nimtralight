@@ -1,4 +1,4 @@
-import nimtralight_sys
+import nimtralight
 
 const html = """
   <html>

@@ -31,4 +31,4 @@ task basic, "Build basic app":
   exec sampleCmd("basic_app")
 
 task wrap, "Generate wrap":
-  exec "nim c -rf nimtralight_sys/genwrap"
+  exec "nim c -rf nimtralight/genwrap"

@@ -1,4 +1,4 @@
-import nimtralight_sys/[wrap, converters, helpers, callback]
+import nimtralight/[wrap, converters, helpers, callback]
 export wrap, converters, helpers, callback
 
 # {.passL: "-Wl,-rpath -Wl,. -L."}
