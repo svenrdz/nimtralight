@@ -1,3 +1,4 @@
+import os
 import nimtralight
 
 const html = """
@@ -50,22 +51,23 @@ callback ULFinishLoadingCallback:
     if isMainFrame:
       echo "Our page has loaded!"
 
-var config = newConfig()
+var config = initConfig()
 config.deviceScale = 2.0
-config.fontFamilyStandard = "Arial"
-config.resourcePath = "./resources/"
+config.fontFamilyStandard = s16"Arial"
+config.resourcePath = (currentSourcePath.parentDir.parentDir.parentDir / "sdk" /
+    "bin" / "resources").s16
 config.useGpuRenderer = false
 
 enablePlatformFontLoader()
-enablePlatformFileSystem("./assets/")
-enableDefaultLogger("ultralight.log")
+enablePlatformFileSystem(ul"./assets/")
+enableDefaultLogger(ul"ultralight.log")
 
 var
   renderer = config.createRenderer()
   view = renderer.createView(1600, 1600, false, nil, false)
 
 view.setFinishLoadingCallback(onFinish, nil)
-view.loadHTML(html)
+view.loadHTML(html.ul)
 
 echo "Starting Run(), waiting for page to load..."
 

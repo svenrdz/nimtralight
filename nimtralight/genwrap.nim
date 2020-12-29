@@ -20,11 +20,14 @@ cOverride:
   const ULInvalidFileHandle* = -1.cint
 
   type
-    ULChar16* = cushort
-    CString* = object
-      data*: ref UncheckedArray[ULChar16]
-      len*: cint
-    ULString* = ref CString
+    Char16* = cushort
+    ULChar16* = Char16
+    JSChar* = Char16
+    String16* = object
+      data*: ptr Char16
+      length*: uint
+    ULStringRef* = pointer
+    JSStringRef* = pointer
 
     ULFaceWinding* {.size: sizeof(cint).} = enum
       fwClockwise
@@ -33,8 +36,8 @@ cOverride:
       fhSmooth
       fhNormal
       fhMonochrome
-    CConfig* = object
-      resourcePath*, cachePath*: CString
+    Config* = ref object
+      resourcePath*, cachePath*: String16
       useGpuRenderer*: bool
       deviceScale*: cdouble
       faceWinding*: ULFaceWinding
@@ -42,12 +45,12 @@ cOverride:
       enableJavascript*: bool
       fontHinting*: ULFontHinting
       fontGamma*: cdouble
-      fontFamilyStandard*: CString
-      fontFamilyFixed*: CString
-      fontFamilySerif*: CString
-      fontFamilySansSerif*: CString
-      userAgent*: CString
-      userStylesheet*: CString
+      fontFamilyStandard*: String16
+      fontFamilyFixed*: String16
+      fontFamilySerif*: String16
+      fontFamilySansSerif*: String16
+      userAgent*: String16
+      userStylesheet*: String16
       forceRepaint*: bool
       animationTimerDelay*: cdouble
       scrollTimerDelay*: cdouble
@@ -57,7 +60,8 @@ cOverride:
       overrideRamSize*: uint32
       minLargeHeapSize*: uint32
       minSmallHeapSize*: uint32
-    ULConfig* = ref CConfig
+    ULConfig* = ref object
+      val*: Config
 
     ULRenderer* = distinct pointer
     ULSession* = distinct pointer
@@ -70,13 +74,14 @@ cOverride:
     ULSurface* = distinct pointer
     ULBitmapSurface* = ULSurface
 
-    CSettings* = object
-      developerName*: CString
-      appName*: CString
-      fileSystemPath*: CString
+    Settings* = object
+      developerName*: String16
+      appName*: String16
+      fileSystemPath*: String16
       loadShadersFromFileSystem*: bool
       forceCpuRenderer*: bool
-    ULSettings* = ref CSettings
+    ULSettings* = ref object
+      val*: Settings
 
     ULWindowFlags* {.size: sizeof(cuint).} = enum
       wfBorderless = 1 shl 0
@@ -84,21 +89,46 @@ cOverride:
       wfResizable = 1 shl 2
       wfMaximizable = 1 shl 3
 
-    ULApp* = distinct pointer
-    ULWindow* = distinct pointer
-    ULMonitor* = distinct pointer
-    ULOverlay* = distinct pointer
+    CApp* = object
+    ULApp* = ptr CApp
 
-    JSChar* = ULChar16
-    JSContextRef* = distinct pointer
+    CWindow* = object
+    ULWindow* = ptr CWindow
 
-    OpaqueJSValue* = pointer
-    OpaqueJSClass* = pointer
-    OpaqueJSString* = pointer
-    OpaqueJSContext* = pointer
-    OpaqueJSContextGroup* = pointer
-    OpaqueJSPropertyNameArray* = pointer
-    OpaqueJSPropertyNameAccumulator* = pointer
+    CMonitor* = object
+    ULMonitor* = ptr CMonitor
+
+    COverlay* = object
+    ULOverlay* = ptr COverlay
+
+    # WTFStringImpl*  = object
+    #   data* {.importc: "m_data16".}: ref UncheckedArray[JSChar]
+    #   len* {.importc: "m_length".}: cuint
+    # WTFString* = object
+    #   data* {.importc: "m_impl".}: ref WTFStringImpl
+    # OpaqueJSString* = object
+      # data* {.importc: "m_string".}: WTFString
+    # JSStringRef* = pointer
+
+    OpaqueJSContextGroup* = object
+    JSContextGroupRef* = ptr OpaqueJSContextGroup
+
+    OpaqueJSContext* = object
+    JSContextRef* = ptr OpaqueJSContext
+    JSGlobalContextRef* = ptr OpaqueJSContext
+
+    OpaqueJSClass* = object
+    JSClassRef* = ptr OpaqueJSClass
+
+    OpaqueJSPropertyNameArray* = object
+    JSPropertyNameArrayRef* = ptr OpaqueJSPropertyNameArray
+
+    OpaqueJSPropertyNameAccumulator* = object
+    JSPropertyNameAccumulatorRef* = ptr OpaqueJSPropertyNameAccumulator
+
+    OpaqueJSValue* = object
+    JSValueRef* = ptr OpaqueJSValue
+    JSObjectRef* = ptr OpaqueJSValue
 
 cPlugin:
   import strutils, sugar
@@ -108,6 +138,8 @@ cPlugin:
 
   proc onSymbol*(sym: var Symbol) {.exportc, dynlib.} =
     sym.name = sym.name.strip(chars = {'_'})
+    if sym.kind == nskType and sym.name == "ULString":
+      sym.name = "ULStringRef"
     if sym.kind == nskProc and sym.name.startsWith("ul"):
       sym.name = sym.name.dup:
         removePrefix("ulConfig")

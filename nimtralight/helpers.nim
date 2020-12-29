@@ -1,10 +1,6 @@
 import wrap, converters
 
-proc `$`*(s: ULString | CString): string =
-  for i in 0..<s.len:
-    result.add $(char(s.data[i]))
-
-proc initConfig: CConfig =
+proc initConfig*: Config =
   result.useGpuRenderer = false
   result.deviceScale = 1.0
   result.faceWinding = fwCounterClockwise
@@ -16,7 +12,7 @@ proc initConfig: CConfig =
   result.fontFamilySerif = "Times New Roman"
   result.fontFamilySansSerif = "Arial"
   result.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " &
-                     "AppleWebKit/608.3.10 (KHTML, like Gecko)" &
+                     "AppleWebKit/608.3.10 (KHTML, like Gecko) " &
                      "Ultralight/1.2.0 Safari/608.3.10"
   result.forceRepaint = false
   result.animationTimerDelay = 1.0 / 60.0
@@ -28,15 +24,9 @@ proc initConfig: CConfig =
   result.minLargeHeapSize = 32 * 1024 * 1024
   result.minSmallHeapSize = 1 * 1024 * 1024
 
-proc newConfig*: ULConfig =
-  result = initConfig()
-
-proc initSettings: CSettings =
+proc initSettings*: Settings =
   result.developerName = "MyCompany"
   result.appName = "MyApp"
   result.fileSystemPath = "./assets/"
   result.loadShadersFromFileSystem = false
   result.forceCpuRenderer = false
-
-proc newSettings*: ULSettings =
-  result = initSettings()
