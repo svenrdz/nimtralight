@@ -8,3 +8,4 @@ sdk*
 **/*.log
 **/*.out
 .DS_STORE
+nimtralight/wrap.nim
