@@ -34,8 +34,8 @@ settings.forceCPURenderer = true
 enableDefaultLogger(ul"ultralight.log")
 
 var config = initConfig()
-config.resourcePath = (currentSourcePath.parentDir.parentDir.parentDir / "sdk" /
-    "bin" / "resources").s16
+config.resourcePath = currentSourcePath.parentDir.parentDir.parentDir / "sdk" /
+    "bin" / "resources"
 var app = settings.createApp(config)
 
 app.setUpdateCallback(onUpdate, nil)

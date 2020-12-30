@@ -53,9 +53,9 @@ callback ULFinishLoadingCallback:
 
 var config = initConfig()
 config.deviceScale = 2.0
-config.fontFamilyStandard = s16"Arial"
-config.resourcePath = (currentSourcePath.parentDir.parentDir.parentDir / "sdk" /
-    "bin" / "resources").s16
+config.fontFamilyStandard = "Arial"
+config.resourcePath = currentSourcePath.parentDir.parentDir.parentDir / "sdk" /
+    "bin" / "resources"
 config.useGpuRenderer = false
 
 enablePlatformFontLoader()

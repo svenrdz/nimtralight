@@ -13,7 +13,7 @@ skipDirs = @["build", "samples"]
 
 requires "nim >= 1.4.2", "nimterop >= 0.6.13"
 
-const lang = "cpp"
+const lang = "c"
 
 proc ext(): string =
   when defined(windows):

@@ -23,9 +23,6 @@ cOverride:
     Char16* = cushort
     ULChar16* = Char16
     JSChar* = Char16
-    String16* = object
-      data*: ptr Char16
-      length*: uint
     ULStringRef* = pointer
     JSStringRef* = pointer
 
@@ -36,99 +33,38 @@ cOverride:
       fhSmooth
       fhNormal
       fhMonochrome
-    Config* = ref object
-      resourcePath*, cachePath*: String16
-      useGpuRenderer*: bool
-      deviceScale*: cdouble
-      faceWinding*: ULFaceWinding
-      enableImages*: bool
-      enableJavascript*: bool
-      fontHinting*: ULFontHinting
-      fontGamma*: cdouble
-      fontFamilyStandard*: String16
-      fontFamilyFixed*: String16
-      fontFamilySerif*: String16
-      fontFamilySansSerif*: String16
-      userAgent*: String16
-      userStylesheet*: String16
-      forceRepaint*: bool
-      animationTimerDelay*: cdouble
-      scrollTimerDelay*: cdouble
-      recycleDelay*: cdouble
-      memoryCacheSize*: uint32
-      pageCacheSize*: uint32
-      overrideRamSize*: uint32
-      minLargeHeapSize*: uint32
-      minSmallHeapSize*: uint32
-    ULConfig* = ref object
-      val*: Config
 
-    ULRenderer* = distinct pointer
-    ULSession* = distinct pointer
+    ULConfig* = pointer
+    ULRenderer* = pointer
+    ULSession* = pointer
     ULView* = distinct pointer
     ULBitmap* = distinct pointer
-    ULBuffer* = distinct pointer
-    ULKeyEvent* = distinct pointer
-    ULMouseEvent* = distinct pointer
-    ULScrollEvent* = distinct pointer
+    ULBuffer* = pointer
+    ULKeyEvent* = pointer
+    ULMouseEvent* = pointer
+    ULScrollEvent* = pointer
     ULSurface* = distinct pointer
     ULBitmapSurface* = ULSurface
+    ULSettings* = pointer
+    ULApp* = pointer
+    ULWindow* = pointer
+    ULMonitor* = distinct pointer
+    ULOverlay* = distinct pointer
 
-    Settings* = object
-      developerName*: String16
-      appName*: String16
-      fileSystemPath*: String16
-      loadShadersFromFileSystem*: bool
-      forceCpuRenderer*: bool
-    ULSettings* = ref object
-      val*: Settings
+    JSContextGroupRef* = pointer
+    JSContextRef* = pointer
+    JSGlobalContextRef* = pointer
+    JSClassRef* = pointer
+    JSPropertyNameArrayRef* = pointer
+    JSPropertyNameAccumulatorRef* = pointer
+    JSValueRef* = pointer
+    JSObjectRef* = pointer
 
     ULWindowFlags* {.size: sizeof(cuint).} = enum
       wfBorderless = 1 shl 0
       wfTitled = 1 shl 1
       wfResizable = 1 shl 2
       wfMaximizable = 1 shl 3
-
-    CApp* = object
-    ULApp* = ptr CApp
-
-    CWindow* = object
-    ULWindow* = ptr CWindow
-
-    CMonitor* = object
-    ULMonitor* = ptr CMonitor
-
-    COverlay* = object
-    ULOverlay* = ptr COverlay
-
-    # WTFStringImpl*  = object
-    #   data* {.importc: "m_data16".}: ref UncheckedArray[JSChar]
-    #   len* {.importc: "m_length".}: cuint
-    # WTFString* = object
-    #   data* {.importc: "m_impl".}: ref WTFStringImpl
-    # OpaqueJSString* = object
-      # data* {.importc: "m_string".}: WTFString
-    # JSStringRef* = pointer
-
-    OpaqueJSContextGroup* = object
-    JSContextGroupRef* = ptr OpaqueJSContextGroup
-
-    OpaqueJSContext* = object
-    JSContextRef* = ptr OpaqueJSContext
-    JSGlobalContextRef* = ptr OpaqueJSContext
-
-    OpaqueJSClass* = object
-    JSClassRef* = ptr OpaqueJSClass
-
-    OpaqueJSPropertyNameArray* = object
-    JSPropertyNameArrayRef* = ptr OpaqueJSPropertyNameArray
-
-    OpaqueJSPropertyNameAccumulator* = object
-    JSPropertyNameAccumulatorRef* = ptr OpaqueJSPropertyNameAccumulator
-
-    OpaqueJSValue* = object
-    JSValueRef* = ptr OpaqueJSValue
-    JSObjectRef* = ptr OpaqueJSValue
 
 cPlugin:
   import strutils, sugar

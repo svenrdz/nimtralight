@@ -45,3 +45,6 @@ defineGetter(height, ULSurface)
 defineGetter(height, ULMonitor)
 defineGetter(height, ULWindow)
 defineGetter(height, ULOverlay)
+
+converter toBitFlag*[T: enum](flags: set[T]): cuint =
+  cast[cuint](flags)
