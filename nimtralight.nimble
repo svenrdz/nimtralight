@@ -26,7 +26,7 @@ proc setupBuildDir() =
 
 proc sampleCmd(name: string): string =
   setupBuildDir()
-  let outFile = "build" / name & ext()
+  let outFile = "build" / name
   let src = "samples" / name / "main"
   # join([outFile, src], " ")
   switch("out", outFile)
