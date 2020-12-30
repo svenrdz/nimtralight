@@ -26,7 +26,7 @@ proc setupBuildDir() =
 
 proc sampleCmd(name: string): string =
   setupBuildDir()
-  let outFile = "build" / name
+  let outFile = "build" / name & ext()
   let src = "samples" / name / "main"
   # join([outFile, src], " ")
   switch("out", outFile)
@@ -46,6 +46,6 @@ task intro, "Build intro to c api":
 task wrap, "Generate wrap":
   setupBuildDir()
   switch("run")
-  switch("out", "build/genwrap")
+  switch("out", "build/genwrap" & ext())
   switch("forceBuild", "on")
   setCommand lang, "nimtralight/genwrap"
