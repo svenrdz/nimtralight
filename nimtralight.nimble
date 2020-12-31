@@ -30,7 +30,7 @@ proc sampleCmd(name: string): string =
   let src = "samples" / name / "main"
   # join([outFile, src], " ")
   switch("out", outFile)
-  switch("path", "../../")
+  switch("path", ".." / "..")
   switch("run")
   src
 
