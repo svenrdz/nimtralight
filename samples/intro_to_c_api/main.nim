@@ -49,7 +49,7 @@ app.setWindow(window)
 overlay = window.createOverlay(window.width, window.height, 0, 0)
 view = overlay.getView
 view.setDOMReadyCallback(onDOMReady, nil)
-view.loadURL(ul"file:///app.html")
+view.loadURL(ul"file:///samples/intro_to_c_api/app.html")
 
 app.run
 
