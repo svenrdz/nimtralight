@@ -32,6 +32,7 @@ callback ULDOMReadyCallback:
 var settings = initSettings()
 settings.forceCPURenderer = true
 enableDefaultLogger(ul"ultralight.log")
+enablePlatformFileSystem(ul"samples/intro_to_c_api/assets")
 
 var config = initConfig()
 config.resourcePath = currentSourcePath.parentDir.parentDir.parentDir / "sdk" /
@@ -49,7 +50,7 @@ app.setWindow(window)
 overlay = window.createOverlay(window.width, window.height, 0, 0)
 view = overlay.getView
 view.setDOMReadyCallback(onDOMReady, nil)
-view.loadURL(ul"file:///samples/intro_to_c_api/app.html")
+view.loadURL(ul"file:///app.html")
 
 app.run
 
