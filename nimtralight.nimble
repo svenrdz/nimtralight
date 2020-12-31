@@ -20,9 +20,9 @@ proc ext(): string =
     result = ".exe"
 
 proc setupBuildDir() =
-  if dirExists("build"):
-    rmDir("build")
-  mkDir("build")
+  if not dirExists("build"):
+    mkDir("build")
+  # rmDir("build")
 
 proc sampleCmd(name: string): string =
   setupBuildDir()
