@@ -19,17 +19,9 @@ proc ext(): string =
   when defined(windows):
     result = ".exe"
 
-proc setupBuildDir() =
-  if not dirExists("build"):
-    mkDir("build")
-  # rmDir("build")
-
 proc sampleCmd(name: string): string =
-  setupBuildDir()
   let outFile = fmt"build/{name & ext()}"
   let src = fmt"samples/{name}/main"
-  echo src
-  # join([outFile, src], " ")
   switch("out", outFile)
   switch("path", "../..")
   switch("run")
@@ -44,9 +36,7 @@ task basic, "Build basic app":
 task intro, "Build intro to c api":
   setCommand lang, sampleCmd("intro_to_c_api")
 
-task wrap, "Generate wrap":
-  setupBuildDir()
-  switch("run")
-  switch("out", "build/genwrap" & ext())
-  switch("forceBuild", "on")
-  setCommand lang, "nimtralight/genwrap"
+before install:
+  if not dirExists("build"):
+    mkDir("build")
+  exec fmt"nim c -r -o:build/genwrap{ext()} nimtralight/genwrap"
