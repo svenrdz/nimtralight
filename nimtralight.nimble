@@ -1,5 +1,5 @@
 # Package
-import os, strutils
+import os, strutils, strformat
 
 version = "0.1.0"
 author = "svenrdz"
@@ -26,11 +26,12 @@ proc setupBuildDir() =
 
 proc sampleCmd(name: string): string =
   setupBuildDir()
-  let outFile = "build" / name & ext()
-  let src = "samples" / name / "main"
+  let outFile = fmt"build/{name & ext()}"
+  let src = fmt"samples/{name}/main"
+  echo src
   # join([outFile, src], " ")
   switch("out", outFile)
-  switch("path", ".." / "..")
+  switch("path", "../..")
   switch("run")
   src
 
