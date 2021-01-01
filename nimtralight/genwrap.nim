@@ -20,11 +20,11 @@ cOverride:
   const ULInvalidFileHandle* = -1.cint
 
   type
-    ULChar16* = cushort
-    CString* = object
-      data*: ref UncheckedArray[ULChar16]
-      len*: cint
-    ULString* = ref CString
+    Char16* = cushort
+    ULChar16* = Char16
+    JSChar* = Char16
+    ULStringRef* = pointer
+    JSStringRef* = pointer
 
     ULFaceWinding* {.size: sizeof(cint).} = enum
       fwClockwise
@@ -33,72 +33,38 @@ cOverride:
       fhSmooth
       fhNormal
       fhMonochrome
-    CConfig* = object
-      resourcePath*, cachePath*: CString
-      useGpuRenderer*: bool
-      deviceScale*: cdouble
-      faceWinding*: ULFaceWinding
-      enableImages*: bool
-      enableJavascript*: bool
-      fontHinting*: ULFontHinting
-      fontGamma*: cdouble
-      fontFamilyStandard*: CString
-      fontFamilyFixed*: CString
-      fontFamilySerif*: CString
-      fontFamilySansSerif*: CString
-      userAgent*: CString
-      userStylesheet*: CString
-      forceRepaint*: bool
-      animationTimerDelay*: cdouble
-      scrollTimerDelay*: cdouble
-      recycleDelay*: cdouble
-      memoryCacheSize*: uint32
-      pageCacheSize*: uint32
-      overrideRamSize*: uint32
-      minLargeHeapSize*: uint32
-      minSmallHeapSize*: uint32
-    ULConfig* = ref CConfig
 
-    ULRenderer* = distinct pointer
-    ULSession* = distinct pointer
+    ULConfig* = pointer
+    ULRenderer* = pointer
+    ULSession* = pointer
     ULView* = distinct pointer
     ULBitmap* = distinct pointer
-    ULBuffer* = distinct pointer
-    ULKeyEvent* = distinct pointer
-    ULMouseEvent* = distinct pointer
-    ULScrollEvent* = distinct pointer
+    ULBuffer* = pointer
+    ULKeyEvent* = pointer
+    ULMouseEvent* = pointer
+    ULScrollEvent* = pointer
     ULSurface* = distinct pointer
     ULBitmapSurface* = ULSurface
+    ULSettings* = pointer
+    ULApp* = pointer
+    ULWindow* = pointer
+    ULMonitor* = distinct pointer
+    ULOverlay* = distinct pointer
 
-    CSettings* = object
-      developerName*: CString
-      appName*: CString
-      fileSystemPath*: CString
-      loadShadersFromFileSystem*: bool
-      forceCpuRenderer*: bool
-    ULSettings* = ref CSettings
+    JSContextGroupRef* = pointer
+    JSContextRef* = pointer
+    JSGlobalContextRef* = pointer
+    JSClassRef* = pointer
+    JSPropertyNameArrayRef* = pointer
+    JSPropertyNameAccumulatorRef* = pointer
+    JSValueRef* = pointer
+    JSObjectRef* = pointer
 
     ULWindowFlags* {.size: sizeof(cuint).} = enum
       wfBorderless = 1 shl 0
       wfTitled = 1 shl 1
       wfResizable = 1 shl 2
       wfMaximizable = 1 shl 3
-
-    ULApp* = distinct pointer
-    ULWindow* = distinct pointer
-    ULMonitor* = distinct pointer
-    ULOverlay* = distinct pointer
-
-    JSChar* = ULChar16
-    JSContextRef* = distinct pointer
-
-    OpaqueJSValue* = pointer
-    OpaqueJSClass* = pointer
-    OpaqueJSString* = pointer
-    OpaqueJSContext* = pointer
-    OpaqueJSContextGroup* = pointer
-    OpaqueJSPropertyNameArray* = pointer
-    OpaqueJSPropertyNameAccumulator* = pointer
 
 cPlugin:
   import strutils, sugar
@@ -108,6 +74,8 @@ cPlugin:
 
   proc onSymbol*(sym: var Symbol) {.exportc, dynlib.} =
     sym.name = sym.name.strip(chars = {'_'})
+    if sym.kind == nskType and sym.name == "ULString":
+      sym.name = "ULStringRef"
     if sym.kind == nskProc and sym.name.startsWith("ul"):
       sym.name = sym.name.dup:
         removePrefix("ulConfig")

@@ -1,8 +1,12 @@
-import nimtralight/[wrap, converters, helpers, callback]
-export wrap, converters, helpers, callback
+import nimtralight/[wrap, callback, string, config, settings]
+export wrap, callback, string, config, settings
 
-# {.passL: "-Wl,-rpath -Wl,. -L."}
+{.passL: "-Lbuild".}
+when defined(macosx):
+  {.passL: "-rpath build".}
+elif defined(linux):
+  {.passL: "-Wl,-rpath,build".}
 {.passL: "-lUltralight".}
-# {.passL: "-lUltralightCore".}
+{.passL: "-lUltralightCore".}
 {.passL: "-lAppCore".}
 {.passL: "-lWebCore".}
