@@ -20,13 +20,9 @@ proc `$`*(s: ULString | JSString): string =
     result.add buf[i].char
 
 proc `=destroy`*(s: var ULString) =
-  echo "=destroy ULString"
-  echo $s
   s.p.destroyString
 
 proc `=destroy`*(s: var JSString) =
-  echo "=destroy JSString"
-  echo $s
   s.p.JSStringRelease
 
 converter ul*(s: string): ULString =
