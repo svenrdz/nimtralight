@@ -1,9 +1,6 @@
 import os
 import nimtralight
 
-when defined(gcDestructors):
-  echo "hello"
-
 var
   overlay {.global.}: ULOverlay
   view {.global.}: ULView
