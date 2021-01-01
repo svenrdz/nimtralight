@@ -43,7 +43,8 @@ app.setUpdateCallback(onUpdate, nil)
 
 var
   monitor = app.getMainMonitor
-  window = monitor.createWindow(500, 500, false, {wfTitled, wfResizable})
+  window = monitor.createWindow(500, 500, false, wfTitled | wfResizable)
+
 window.setTitle("Ultralight Sample 6 - Intro to C API")
 window.setResizeCallback(onResize, nil)
 app.setWindow(window)

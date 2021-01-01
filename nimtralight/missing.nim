@@ -7,7 +7,7 @@ proc resize*(surface: ULSurface; width: cuint; height: cuint) {.
 proc resize*(overlay: ULOverlay; width: cuint; height: cuint) {.
     importc: "ulOverlayResize", cdecl.}
 
-macro defineGetter*(getter: untyped, typ: typedesc): untyped =
+macro defineGetter*(getter: untyped; typ: typedesc): untyped =
   let
     name = typ.strVal[2..^1]
     paramName = name.toLowerAscii.ident
@@ -22,8 +22,8 @@ macro defineGetter*(getter: untyped, typ: typedesc): untyped =
         paramName,
         typ,
         newEmptyNode()
-      )
-    ),
+    )
+  ),
     nnkPragma.newTree(
       newColonExpr(ident"importc", cName.ident.toStrLit),
       ident"cdecl"
@@ -46,5 +46,8 @@ defineGetter(height, ULMonitor)
 defineGetter(height, ULWindow)
 defineGetter(height, ULOverlay)
 
-converter toBitFlag*[T: enum](flags: set[T]): cuint =
-  cast[cuint](flags)
+converter toNum*[T: enum](flag: T): cuint =
+  cast[cuint](flag)
+
+proc `|`*[T: enum](a, b: T): cuint =
+  a.cuint + b.cuint
